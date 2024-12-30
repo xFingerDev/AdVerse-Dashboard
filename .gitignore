@@ -7,3 +7,7 @@ expo-env.d.ts
 /.expo
 .DS_Store
 /node_modules
+google-services.json
+/android
+/ios
+GoogleService-Info.plist
