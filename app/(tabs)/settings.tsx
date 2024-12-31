@@ -14,6 +14,50 @@ export default function SettingsScreen() {
       console.log(ddd);
       const userInfo = await GoogleSignin.signIn();
       console.log(userInfo);
+      userInfo.data?.idToken;
+
+      //GAY:https://developers.google.com/oauthplayground/
+      //const user = await GoogleSignin.getCurrentUser();
+      // console.log({ user });
+      const token = await GoogleSignin.getTokens();
+      console.log(token.accessToken);
+      const accounts = await fetch("https://admob.googleapis.com/v1/accounts", {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token.accessToken,
+        },
+      });
+
+      const publishers: {
+        account: {
+          currencyCode: string;
+          name: string;
+          publisherId: string;
+          reportingTimeZone: string;
+        }[];
+      } = await accounts.json();
+
+      const accounts2 = await fetch(
+        `https://admob.googleapis.com/v1/${publishers.account[0].name}/apps`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token.accessToken,
+          },
+        }
+      );
+
+      const adsApps: {
+        apps: {
+          platform: "ANDROID" | "IOS";
+          manualAppInfo: {
+            displayName: string;
+          };
+          appApprovalState: "ACTION_REQUIRED" | "APPROVED";
+          name: string;
+          appId: string;
+        }[];
+      } = await accounts2.json();
     } catch (error: any) {
       console.log({
         statusCodes,

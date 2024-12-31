@@ -32,7 +32,6 @@ GoogleSignin.configure({
     "https://www.googleapis.com/auth/admob.readonly",
     "https://www.googleapis.com/auth/admob.report",
   ],
-  //webClientId: "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",
   iosClientId:
     "955716707860-solhabc5jfk8bi3jnk2okrm1ibqdvf39.apps.googleusercontent.com",
 });
