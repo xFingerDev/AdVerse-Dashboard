@@ -4,6 +4,7 @@ import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import AdMobRepository from "@/repository/admob/admob";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -11,53 +12,32 @@ export default function SettingsScreen() {
   const handleRemoveAds = async () => {
     try {
       const ddd = await GoogleSignin.hasPlayServices();
-      console.log(ddd);
-      const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
-      userInfo.data?.idToken;
+      //console.log(ddd);
+      //await GoogleSignin.signOut();
+      //await GoogleSignin.revokeAccess();
+      if (!GoogleSignin.hasPreviousSignIn()) {
+        GoogleSignin.signIn();
+        // const user = await GoogleSignin.getCurrentUser();
+      }
+      console.log();
+      //  console.log({ user });
+      //const userInfo = await GoogleSignin.signInSilently();
+      //const userInfo = await GoogleSignin.signIn();
+      //console.log(userInfo);
+      // userInfo.data?.idToken;
 
       //GAY:https://developers.google.com/oauthplayground/
       //const user = await GoogleSignin.getCurrentUser();
       // console.log({ user });
       const token = await GoogleSignin.getTokens();
-      console.log(token.accessToken);
-      const accounts = await fetch("https://admob.googleapis.com/v1/accounts", {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + token.accessToken,
-        },
-      });
+      //console.log(token.accessToken);
 
-      const publishers: {
-        account: {
-          currencyCode: string;
-          name: string;
-          publisherId: string;
-          reportingTimeZone: string;
-        }[];
-      } = await accounts.json();
+      const sss = new AdMobRepository(token.accessToken);
+      console.log("1");
+      const accounts = await sss.getListAccounts();
 
-      const accounts2 = await fetch(
-        `https://admob.googleapis.com/v1/${publishers.account[0].name}/apps`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + token.accessToken,
-          },
-        }
-      );
-
-      const adsApps: {
-        apps: {
-          platform: "ANDROID" | "IOS";
-          manualAppInfo: {
-            displayName: string;
-          };
-          appApprovalState: "ACTION_REQUIRED" | "APPROVED";
-          name: string;
-          appId: string;
-        }[];
-      } = await accounts2.json();
+      const apps = await sss.getListApp(accounts[0].accountId);
+      console.log({ apps });
     } catch (error: any) {
       console.log({
         statusCodes,
@@ -107,7 +87,6 @@ export default function SettingsScreen() {
         onPress={handleManageServices}
         style={{ marginBottom: 16 }}
       />*/}
-
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
         <Button title="GitHub" onPress={handleOpenGitHub} />
       </View>

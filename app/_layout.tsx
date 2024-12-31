@@ -12,8 +12,7 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { useColorScheme } from "@/components/useColorScheme";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-
+import "@/constants/Google";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -27,14 +26,6 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-GoogleSignin.configure({
-  scopes: [
-    "https://www.googleapis.com/auth/admob.readonly",
-    "https://www.googleapis.com/auth/admob.report",
-  ],
-  iosClientId:
-    "955716707860-solhabc5jfk8bi3jnk2okrm1ibqdvf39.apps.googleusercontent.com",
-});
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
