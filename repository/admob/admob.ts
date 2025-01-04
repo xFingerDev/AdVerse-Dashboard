@@ -13,6 +13,7 @@ class AdMobRepository implements IAdNetwork {
     url: string,
     options?: {
       method?: string;
+      body?: any;
     }
   ): Promise<T> {
     const result = await fetch(`${this.URL_ADMOB}${url}`, {
@@ -20,7 +21,11 @@ class AdMobRepository implements IAdNetwork {
       headers: {
         Authorization: "Bearer " + this.token,
       },
+      body: options?.body ? JSON.stringify(options?.body) : undefined,
     });
+    /*
+      TODO: On Token Expired refresh Token
+    */
 
     return await result.json();
   }
@@ -33,15 +38,21 @@ class AdMobRepository implements IAdNetwork {
           displayName: string;
         };
         appApprovalState: "ACTION_REQUIRED" | "APPROVED";
+        linkedAppInfo: {
+          appStoreId: string;
+          displayName: string;
+        };
         name: string;
         appId: string;
       }[];
     }>(`accounts/${accountId}/apps`);
 
-    return apps.map(({ appId, name }) => ({
-      id: appId,
-      name: name,
-    }));
+    return apps.map(
+      ({ appId, linkedAppInfo, manualAppInfo: { displayName } }) => ({
+        id: appId,
+        name: linkedAppInfo?.displayName ?? displayName,
+      })
+    );
   }
 
   public async getListAccounts(): Promise<
@@ -63,6 +74,48 @@ class AdMobRepository implements IAdNetwork {
       accountId: account.publisherId,
       timeZone: account.reportingTimeZone,
     }));
+  }
+
+  public async getAnalytics(accountId: string) {
+    const data = await this.fetch<{}>(
+      `accounts/${accountId}/networkReport:generate`,
+      {
+        method: "POST",
+        body: {
+          reportSpec: {
+            dateRange: {
+              startDate: {
+                year: 2025,
+                month: 1,
+                day: 1,
+              },
+              endDate: {
+                year: 2025,
+                month: 1,
+                day: 1,
+              },
+            },
+            dimensions: ["DATE", "APP" /*, "PLATFORM", "COUNTRY"*/], //Filtar solo por lo que se necesita, si es plataforma, si es country, por fecha etc
+            metrics: [
+              "ESTIMATED_EARNINGS",
+              "AD_REQUESTS",
+              "MATCHED_REQUESTS",
+              "IMPRESSIONS",
+            ],
+            /* dimensionFilters: [
+              {
+                dimension: "APP",
+                matchesAny: {
+                  values: ["ca-app-pub-4713105116292090~6827044441"],
+                },
+              },
+            ],*/
+          },
+        },
+      }
+    );
+
+    console.log(JSON.stringify(data));
   }
 }
 

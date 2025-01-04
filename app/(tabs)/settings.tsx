@@ -5,6 +5,7 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import AdMobRepository from "@/repository/admob/admob";
+import AdNetworkManager from "@/repository/AdNetworkManager";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -22,7 +23,7 @@ export default function SettingsScreen() {
       //if (!GoogleSignin.()) {
       console.log("1");
 
-      GoogleSignin.signIn();
+      await GoogleSignin.signIn();
       // const user = await GoogleSignin.getCurrentUser();
       // }
       console.log();
@@ -36,14 +37,27 @@ export default function SettingsScreen() {
       //const user = await GoogleSignin.getCurrentUser();
       // console.log({ user });
       const token = await GoogleSignin.getTokens();
+
+      /*
+      Hanndle token and save it to Secure AsyncStorage
+      */
+      //await GoogleSignin.signOut(); //TODO: ON SAVE TOKEN SIGNOUT FOR ADD FUTURE LOGINS
+
+      // GoogleSignin.getTokens;
       //console.log(token.accessToken);
-      console.log({ token });
+      //console.log({ token });
+
       const sss = new AdMobRepository(token.accessToken);
-      console.log("1");
+      AdNetworkManager.addNetwork(sss);
       const accounts = await sss.getListAccounts();
 
-      const apps = await sss.getListApp(accounts[0].accountId);
-      console.log({ apps });
+      await sss.getAnalytics(accounts[0].accountId);
+
+      // const sss = new AdMobRepository(token.accessToken);
+      //console.log("1");
+      //console.log({ accounts });
+      //const apps = await sss.getListApp(accounts[0].accountId);
+      //console.log({ apps });
     } catch (error: any) {
       console.log({
         statusCodes,
