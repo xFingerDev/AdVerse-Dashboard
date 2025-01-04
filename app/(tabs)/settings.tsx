@@ -15,10 +15,16 @@ export default function SettingsScreen() {
       //console.log(ddd);
       //await GoogleSignin.signOut();
       //await GoogleSignin.revokeAccess();
-      if (!GoogleSignin.hasPreviousSignIn()) {
-        GoogleSignin.signIn();
-        // const user = await GoogleSignin.getCurrentUser();
-      }
+      console.log("0");
+      console.log({
+        data: GoogleSignin.hasPreviousSignIn(),
+      });
+      //if (!GoogleSignin.()) {
+      console.log("1");
+
+      GoogleSignin.signIn();
+      // const user = await GoogleSignin.getCurrentUser();
+      // }
       console.log();
       //  console.log({ user });
       //const userInfo = await GoogleSignin.signInSilently();
@@ -31,7 +37,7 @@ export default function SettingsScreen() {
       // console.log({ user });
       const token = await GoogleSignin.getTokens();
       //console.log(token.accessToken);
-
+      console.log({ token });
       const sss = new AdMobRepository(token.accessToken);
       console.log("1");
       const accounts = await sss.getListAccounts();
