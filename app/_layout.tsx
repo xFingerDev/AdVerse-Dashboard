@@ -7,12 +7,15 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { createContext, useEffect } from "react";
 import "react-native-reanimated";
 import "../global.css";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import "@/constants/Google";
+import { AdNetworkManagerContext } from "@/contexts/AdNetworkManagerContext";
+import AdNetworkManager from "@/repository/AdNetworkManager";
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -23,6 +26,7 @@ export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
 
+//window.AdNetworkManager = new AdNetworkManager();
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -55,13 +59,15 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        {/*<Stack.Screen
+      <AdNetworkManagerContext.Provider value={new AdNetworkManager()}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {/*<Stack.Screen
           name="(modals)/app-detail"
           options={{ presentation: "modal" }}
         />*/}
-      </Stack>
+        </Stack>
+      </AdNetworkManagerContext.Provider>
     </ThemeProvider>
   );
 }

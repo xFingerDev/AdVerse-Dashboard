@@ -1,10 +1,12 @@
 import { IAdNetwork } from "./IAdNetwork";
 
 export default class AdNetworkManager {
-  private static networks: IAdNetwork[] = [];
-  constructor() {}
+  public networks: IAdNetwork[] = [];
+  constructor() {
+    console.log("Constructor");
+  }
 
-  public static addNetwork(network: IAdNetwork) {
+  public addNetwork(network: IAdNetwork) {
     this.networks.push(network);
   }
 }

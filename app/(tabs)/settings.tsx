@@ -5,10 +5,13 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import AdMobRepository from "@/repository/admob/admob";
-import AdNetworkManager from "@/repository/AdNetworkManager";
+
+import { useContext } from "react";
+import { AdNetworkManagerContext } from "../../contexts/AdNetworkManagerContext";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
+  const adNetworkManager = useContext(AdNetworkManagerContext);
 
   const handleRemoveAds = async () => {
     try {
@@ -47,11 +50,12 @@ export default function SettingsScreen() {
       //console.log(token.accessToken);
       //console.log({ token });
 
-      const sss = new AdMobRepository(token.accessToken);
-      AdNetworkManager.addNetwork(sss);
-      const accounts = await sss.getListAccounts();
+      const admobRepo = new AdMobRepository(token.accessToken);
+      adNetworkManager?.addNetwork(admobRepo);
 
-      await sss.getAnalytics(accounts[0].accountId);
+      // const accounts = await admobRepo.getListAccounts();
+
+      // console.log(await admobRepo.getAnalytics(accounts[0].accountId));
 
       // const sss = new AdMobRepository(token.accessToken);
       //console.log("1");
@@ -85,7 +89,7 @@ export default function SettingsScreen() {
     <View className="flex-1 p-4">
       <Text className="text-lg font-bold mb-4">Settings</Text>
 
-      <Button title="Remove Ads" onPress={handleRemoveAds} />
+      <Button title="Load Google" onPress={handleRemoveAds} />
 
       {/*  <Button
         title="Manage Services"
