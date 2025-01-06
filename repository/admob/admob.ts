@@ -186,7 +186,7 @@ class AdMobRepository implements IAdNetwork {
       let id = row.dimensionValues.APP.value;
       const totalAdRequest = Number(row.metricValues.AD_REQUESTS.integerValue);
       const totalEarnings =
-        Number(row.metricValues.ESTIMATED_EARNINGS.microsValue) / 1000;
+        Number(row.metricValues.ESTIMATED_EARNINGS.microsValue) / 10000;
       const totalImpressions = Number(
         row.metricValues.IMPRESSIONS.integerValue
       );
