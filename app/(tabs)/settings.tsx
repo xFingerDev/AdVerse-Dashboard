@@ -7,11 +7,13 @@ import {
 import AdMobRepository from "@/repository/admob/admob";
 
 import { useContext } from "react";
-import { AdNetworkManagerContext } from "../../contexts/AdNetworkManagerContext";
+import { useAdNetworkManager } from "../../contexts/AdNetworkManagerContext";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
-  const adNetworkManager = useContext(AdNetworkManagerContext);
+  const adNetworkManager = useAdNetworkManager();
+  const { t } = useTranslation();
 
   const handleRemoveAds = async () => {
     try {
@@ -51,8 +53,8 @@ export default function SettingsScreen() {
       //console.log({ token });
 
       const admobRepo = new AdMobRepository(token.accessToken);
-      adNetworkManager?.addNetwork(admobRepo);
-
+      adNetworkManager.addNetwork(admobRepo);
+      alert("Google Sinc");
       // const accounts = await admobRepo.getListAccounts();
 
       // console.log(await admobRepo.getAnalytics(accounts[0].accountId));
@@ -87,9 +89,14 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 p-4">
-      <Text className="text-lg font-bold mb-4">Settings</Text>
+      <Text className="text-lg font-bold mb-4">
+        {t("settings.header.title")}
+      </Text>
 
-      <Button title="Load Google" onPress={handleRemoveAds} />
+      <Button
+        title={t("settings.buttons.donation")}
+        onPress={handleRemoveAds}
+      />
 
       {/*  <Button
         title="Manage Services"
@@ -111,7 +118,7 @@ export default function SettingsScreen() {
         onPress={handleManageServices}
         style={{ marginBottom: 16 }}
       />*/}
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+      <View>
         <Button title="GitHub" onPress={handleOpenGitHub} />
       </View>
     </View>

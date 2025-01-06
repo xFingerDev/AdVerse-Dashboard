@@ -7,31 +7,46 @@ import {
   Text,
   View,
 } from "react-native";
-import { AdNetworkManagerContext } from "@/contexts/AdNetworkManagerContext";
+import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
 import { useFocusEffect } from "expo-router";
 import { GlobalAnalytics } from "@/repository/IAdNetwork";
 import { currencySymbols } from "@/constants/CurrencySymbols";
+import { useTranslation } from "react-i18next";
 
 export default function TabOneScreen() {
-  const adNetworkManager = useContext(AdNetworkManagerContext);
+  const adNetworkManager = useAdNetworkManager();
+  const { t } = useTranslation();
+
   const [refreshing, setRefreshing] = useState(false);
   const [analytics, setAnalytics] = useState<GlobalAnalytics | null>(null);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    const accounts = await adNetworkManager?.networks?.[0].getAnalytics(
-      "pub-4713105116292090"
-    );
-    accounts && setAnalytics(accounts);
+    try {
+      const accounts = await adNetworkManager.networks?.[0]
+        .getAnalytics("pub-4713105116292090")
+        .catch((err) => null);
+      accounts && setAnalytics(accounts);
+    } catch (err) {}
+
     setRefreshing(false);
   };
 
   useFocusEffect(() => {
     (async () => {
-      if (analytics) return;
-      const accounts = await adNetworkManager?.networks?.[0]
-        .getAnalytics("pub-4713105116292090")
-        .then((data) => setAnalytics(data));
+      if (analytics || refreshing) return;
+      setRefreshing(true);
+      console.log("Refresh Default");
+      try {
+        const accounts = await adNetworkManager.networks?.[0]
+          .getAnalytics("pub-4713105116292090")
+          .then((data) => setAnalytics(data))
+          .catch((err) => null);
+      } catch (err) {}
+
+      console.log("Refresh Default End");
+
+      setRefreshing(false);
     })();
   });
 

@@ -11,3 +11,4 @@ google-services.json
 /android
 /ios
 GoogleService-Info.plist
+/dist

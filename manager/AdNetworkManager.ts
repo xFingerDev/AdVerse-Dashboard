@@ -1,5 +1,8 @@
-import { IAdNetwork } from "./IAdNetwork";
+import { IAdNetwork } from "@/repository/IAdNetwork";
 
+/*
+ Add Layer for dynamic implementation betwen repositorys and 3th party networks
+*/
 export default class AdNetworkManager {
   public networks: IAdNetwork[] = [];
   constructor() {

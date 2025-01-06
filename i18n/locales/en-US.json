@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "header": {
+      "title": "Settings"
+    },
+    "buttons": {
+      "donation": "Donation"
+    }
+  }
+}

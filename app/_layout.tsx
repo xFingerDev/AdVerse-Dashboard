@@ -13,8 +13,8 @@ import "../global.css";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import "@/constants/Google";
-import { AdNetworkManagerContext } from "@/contexts/AdNetworkManagerContext";
-import AdNetworkManager from "@/repository/AdNetworkManager";
+import { AdNetworkManagerProvider } from "@/contexts/AdNetworkManagerContext";
+import "@/i18n/index";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -59,7 +59,7 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AdNetworkManagerContext.Provider value={new AdNetworkManager()}>
+      <AdNetworkManagerProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           {/*<Stack.Screen
@@ -67,7 +67,7 @@ function RootLayoutNav() {
           options={{ presentation: "modal" }}
         />*/}
         </Stack>
-      </AdNetworkManagerContext.Provider>
+      </AdNetworkManagerProvider>
     </ThemeProvider>
   );
 }

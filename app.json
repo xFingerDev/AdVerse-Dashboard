@@ -46,7 +46,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.955716707860-solhabc5jfk8bi3jnk2okrm1ibqdvf39"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
@@ -58,6 +59,12 @@
       "eas": {
         "projectId": "9534d03d-a19f-48fd-914a-3a74af7be226"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9534d03d-a19f-48fd-914a-3a74af7be226"
     }
   }
 }
