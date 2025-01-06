@@ -167,12 +167,16 @@ class AdMobRepository implements IAdNetwork {
       }
     );
 
+    const { header } = data.find(
+      (item): item is MoneAnaylyticsHeader => "header" in item
+    )!;
     const rowData = data.filter(
       (item): item is MoneAnaylyticsRow => "row" in item
     );
 
     const analytics: GlobalAnalytics = {
       totalAdRequest: 0,
+      currencyCode: header.localizationSettings.currencyCode,
       totalImpressions: 0,
       totalEarnings: 0,
       app: [],
@@ -181,9 +185,8 @@ class AdMobRepository implements IAdNetwork {
     rowData.forEach(({ row }) => {
       let id = row.dimensionValues.APP.value;
       const totalAdRequest = Number(row.metricValues.AD_REQUESTS.integerValue);
-      const totalEarnings = Number(
-        row.metricValues.ESTIMATED_EARNINGS.microsValue
-      );
+      const totalEarnings =
+        Number(row.metricValues.ESTIMATED_EARNINGS.microsValue) / 1000;
       const totalImpressions = Number(
         row.metricValues.IMPRESSIONS.integerValue
       );

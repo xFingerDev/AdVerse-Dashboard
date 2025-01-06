@@ -12,6 +12,7 @@ export type GlobalAnalytics = {
   totalEarnings: number;
   totalImpressions: number;
   totalAdRequest: number;
+  currencyCode: string;
   app: {
     id: string;
     totalEarnings: number;
