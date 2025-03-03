@@ -1,6 +1,8 @@
 export type App = {
   id: string;
   name: string;
+  icon: string;
+  platform: "ANDROID" | "IOS";
 };
 
 export type AccountNetwork = {
@@ -9,9 +11,6 @@ export type AccountNetwork = {
 };
 
 export type GlobalAnalytics = {
-  totalEarnings: number;
-  totalImpressions: number;
-  totalAdRequest: number;
   currencyCode: string;
   app: {
     id: string;
@@ -21,8 +20,12 @@ export type GlobalAnalytics = {
   }[];
 };
 
-export interface IAdNetwork {
+export interface IAdNetworkRepository {
   getListApp(accountId: string): Promise<App[]>;
   getListAccounts(): Promise<AccountNetwork[]>;
-  getAnalytics(accountId: string): Promise<GlobalAnalytics>;
+  getAnalytics(dto: {
+    startDate: Date;
+    endDate: Date;
+    accountId: string;
+  }): Promise<GlobalAnalytics>;
 }

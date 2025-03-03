@@ -12,3 +12,5 @@ google-services.json
 /ios
 GoogleService-Info.plist
 /dist
+*.aab
+.env

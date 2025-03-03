@@ -4,39 +4,56 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { createContext, useEffect } from "react";
+import { useEffect } from "react";
 import "react-native-reanimated";
-import "../global.css";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import "@/constants/Google";
 import { AdNetworkManagerProvider } from "@/contexts/AdNetworkManagerContext";
 import "@/i18n/index";
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+import { Colors } from "react-native-ui-lib";
+import {
+  useFonts,
+  Nunito_400Regular,
+  Nunito_700Bold,
+} from "@expo-google-fonts/nunito";
+export { ErrorBoundary } from "expo-router";
+import { ThemeManager } from "react-native-ui-lib";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { Appearance, Button, StyleSheet } from "react-native";
+import SheetDonation from "@/components/settings/BottonSheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
-//window.AdNetworkManager = new AdNetworkManager();
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+ThemeManager.setComponentTheme("Text", {
+  style: {
+    fontFamily: "Nunito",
+  },
+});
+
+ThemeManager.setComponentTheme("Buttons", {
+  style: {
+    fontFamily: "Nunito",
+  },
+});
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Nunito_400Regular,
+    Nunito_700Bold,
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -55,19 +72,46 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  //TODO: In future handle correclty the dark theme and light theme
   const colorScheme = useColorScheme();
+  Colors.setScheme("light");
+  Appearance.setColorScheme("light");
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AdNetworkManagerProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          {/*<Stack.Screen
-          name="(modals)/app-detail"
-          options={{ presentation: "modal" }}
-        />*/}
-        </Stack>
-      </AdNetworkManagerProvider>
+    <ThemeProvider
+      value={
+        colorScheme === "dark"
+          ? DarkTheme
+          : {
+              ...DefaultTheme,
+              colors: { ...DefaultTheme.colors, background: "white" },
+            }
+      }
+    >
+      <GestureHandlerRootView style={styles.container}>
+        <BottomSheetModalProvider>
+          <AdNetworkManagerProvider>
+            <Stack
+              screenOptions={{
+                navigationBarColor: Colors.grey70,
+              }}
+            >
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(modals)"
+                options={{ headerShown: false }}
+                // options={{ presentation: "modal" }}
+              />
+            </Stack>
+          </AdNetworkManagerProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
+});

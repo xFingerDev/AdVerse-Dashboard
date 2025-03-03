@@ -1,126 +1,187 @@
-import { useNavigation } from "expo-router";
-import { Text, View, Button } from "react-native";
-import {
-  GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
-import AdMobRepository from "@/repository/admob/admob";
-
-import { useContext } from "react";
+import { useState } from "react";
 import { useAdNetworkManager } from "../../contexts/AdNetworkManagerContext";
 import { useTranslation } from "react-i18next";
+import { Card, Colors as ColorsRUI, Text, View } from "react-native-ui-lib";
+import { Alert, Linking, SafeAreaView, ScrollView } from "react-native";
+import Constants from "expo-constants";
+
+import BottonSheet from "@/components/settings/BottonSheet";
+import CustomCardButton from "@/components/settings/CustomCardButton";
+import {
+  useNavigation,
+  useNavigationContainerRef,
+  useRouter,
+} from "expo-router";
+import { useTheme } from "@react-navigation/native";
 
 export default function SettingsScreen() {
-  const navigation = useNavigation();
-  const adNetworkManager = useAdNetworkManager();
+  const router = useRouter();
   const { t } = useTranslation();
+  const [visibleDonation, setVisibleDonation] = useState(false);
 
-  const handleRemoveAds = async () => {
-    try {
-      const ddd = await GoogleSignin.hasPlayServices();
-      //console.log(ddd);
-      //await GoogleSignin.signOut();
-      //await GoogleSignin.revokeAccess();
-      console.log("0");
-      console.log({
-        data: GoogleSignin.hasPreviousSignIn(),
-      });
-      //if (!GoogleSignin.()) {
-      console.log("1");
-
-      await GoogleSignin.signIn();
-      // const user = await GoogleSignin.getCurrentUser();
-      // }
-      console.log();
-      //  console.log({ user });
-      //const userInfo = await GoogleSignin.signInSilently();
-      //const userInfo = await GoogleSignin.signIn();
-      //console.log(userInfo);
-      // userInfo.data?.idToken;
-
-      //GAY:https://developers.google.com/oauthplayground/
-      //const user = await GoogleSignin.getCurrentUser();
-      // console.log({ user });
-      const token = await GoogleSignin.getTokens();
-
-      /*
-      Hanndle token and save it to Secure AsyncStorage
-      */
-      //await GoogleSignin.signOut(); //TODO: ON SAVE TOKEN SIGNOUT FOR ADD FUTURE LOGINS
-
-      // GoogleSignin.getTokens;
-      //console.log(token.accessToken);
-      //console.log({ token });
-
-      const admobRepo = new AdMobRepository(token.accessToken);
-      adNetworkManager.addNetwork(admobRepo);
-      alert("Google Sinc");
-      // const accounts = await admobRepo.getListAccounts();
-
-      // console.log(await admobRepo.getAnalytics(accounts[0].accountId));
-
-      // const sss = new AdMobRepository(token.accessToken);
-      //console.log("1");
-      //console.log({ accounts });
-      //const apps = await sss.getListApp(accounts[0].accountId);
-      //console.log({ apps });
-    } catch (error: any) {
-      console.log({
-        statusCodes,
-      });
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-      } else {
-        // some other error happened
-      }
-    }
-    // Logic to remove ads
+  const handleOpenUrl = (content: string) => {
+    Linking.openURL(content);
   };
 
-  // Logic to manage services
+  const AboutModal = () => {
+    return (
+      <Card
+        marginT-16
+        style={{
+          elevation: 4,
+          shadowColor: "#000",
+          shadowOpacity: 0.3,
+          shadowOffset: { width: 0, height: 4 },
+          shadowRadius: 4,
+        }}
+      >
+        <Card.Section
+          content={[
+            { text: t("settings.about.title"), text60: true, grey10: true },
+          ]}
+          padding-20
+        />
+        <View paddingH-16 paddingB-16>
+          <CustomCardButton
+            label={t("settings.buttons.donation")}
+            iconName={"gift-outline"}
+            iconColor={ColorsRUI.grey20}
+            disabled={visibleDonation}
+            onPress={() => setVisibleDonation(true)}
+          />
 
-  const handleOpenGitHub = () => {
-    // Logic to open GitHub
+          <CustomCardButton
+            label={"GitHub"}
+            iconName={"logo-github"}
+            textColor="white"
+            iconColor="white"
+            cardStyle={{ backgroundColor: "#333" }}
+            onPress={() =>
+              handleOpenUrl("https://github.com/xFingerDev/AdVerse-Dashboard")
+            }
+          />
+
+          <CustomCardButton
+            label={"Discord"}
+            iconName={"logo-discord"}
+            textColor="white"
+            iconColor="white"
+            cardStyle={{ backgroundColor: "#7289da" }}
+            onPress={() => handleOpenUrl("https://discord.gg/88UqrH2QU9")}
+          />
+        </View>
+      </Card>
+    );
+  };
+
+  const GeneralModal = () => {
+    return (
+      <Card
+        style={{
+          elevation: 4,
+          shadowColor: "#000",
+          shadowOpacity: 0.3,
+          shadowOffset: { width: 0, height: 4 },
+          shadowRadius: 4,
+        }}
+      >
+        <Card.Section
+          padding-20
+          content={[
+            {
+              text: t("settings.global.title"),
+              text60: true,
+              grey10: true,
+            },
+          ]}
+        />
+        <View paddingH-16 paddingB-16>
+          <CustomCardButton
+            label={t("settings.buttons.language")}
+            iconName={"language-outline"}
+            iconColor={ColorsRUI.grey20}
+            onPress={() => {
+              Alert.alert("Language", "Coming soon!");
+            }}
+          />
+
+          <CustomCardButton
+            label={t("settings.buttons.manageNetworks")}
+            iconName={"globe-outline"}
+            iconColor={ColorsRUI.grey20}
+            onPress={
+              () => {
+                router.push("/(modals)/analyticsNetwork");
+              } /*setVisibleAdNetworks(true)*/
+            }
+          />
+        </View>
+      </Card>
+    );
+  };
+
+  const DonationSheet = () => {
+    return (
+      <BottonSheet
+        isVisible={visibleDonation}
+        onClose={function () {
+          setVisibleDonation(false);
+        }}
+      >
+        <View margin-16>
+          <CustomCardButton
+            label={"PayPal"}
+            iconName={"logo-paypal"}
+            iconColor={ColorsRUI.grey20}
+            onPress={() =>
+              handleOpenUrl(
+                "https://www.paypal.com/donate/?hosted_button_id=7KVCPM9EJJBXW"
+              )
+            }
+          />
+
+          <CustomCardButton
+            label={"Ko-fi"}
+            iconName={"cafe-outline"}
+            iconColor={ColorsRUI.grey20}
+            onPress={() => handleOpenUrl("https://ko-fi.com/xfingerdev")}
+          />
+
+          <CustomCardButton
+            label={t("settings.buttons.cancel")}
+            textColor={ColorsRUI.red30}
+            centerText={true}
+            iconColor={ColorsRUI.grey20}
+            onPress={() => setVisibleDonation(false)}
+          />
+        </View>
+      </BottonSheet>
+    );
   };
 
   return (
-    <View className="flex-1 p-4">
-      <Text className="text-lg font-bold mb-4">
-        {t("settings.header.title")}
-      </Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <DonationSheet />
 
-      <Button
-        title={t("settings.buttons.donation")}
-        onPress={handleRemoveAds}
-      />
+      <ScrollView>
+        <Text
+          text40BO
+          marginT-16
+          marginL-20
+          color="black"
+          style={{ fontWeight: "bold" }}
+        >
+          {t("settings.header.title")}
+        </Text>
+        <View margin-16>
+          <GeneralModal />
+          <AboutModal />
+        </View>
 
-      {/*  <Button
-        title="Manage Services"
-        onPress={handleManageServices}
-        className="mb-4"
-      />
-
-      <View className="flex-1 justify-end">
-        <Button title="GitHub" onPress={handleOpenGitHub} />
-      </View>
-      <Button
-        title="Remove Ads"
-        onPress={handleRemoveAds}
-        style={{ marginBottom: 16 }}
-      />
-
-      <Button
-        title="Manage Services"
-        onPress={handleManageServices}
-        style={{ marginBottom: 16 }}
-      />*/}
-      <View>
-        <Button title="GitHub" onPress={handleOpenGitHub} />
-      </View>
-    </View>
+        <Text text70 grey10 center marginB-16>
+          {`${t("settings.version.title")} ${Constants.expoConfig?.version}`}
+        </Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

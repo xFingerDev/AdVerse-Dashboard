@@ -1,10 +1,57 @@
 {
+  "analytics": {
+    "header": {
+      "title": "Analytics"
+    },
+    "applications": {
+      "title": "Applications"
+    },
+    "summary": {
+      "earnings": "Earnings",
+      "impressions": "Impressions",
+      "adRequests": "Ad Requests",
+      "eCPM": "eCPM"
+    },
+    "filter": {
+      "date": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "sevenDays": "7 days",
+        "fourteenDays": "14 days",
+        "oneMonth": "1 month",
+        "oneYear": "1 year",
+        "custom": "Custom"
+      }
+    }
+  },
+  "networks": {
+    "manage": {
+      "header": {
+        "title": "Manage Networks"
+      },
+      "buttons": {
+        "add": "Add Network"
+      }
+    }
+  },
   "settings": {
     "header": {
       "title": "Settings"
     },
+    "about": {
+      "title": "About"
+    },
+    "global": {
+      "title": "Global"
+    },
+    "version": {
+      "title": "Version"
+    },
     "buttons": {
-      "donation": "Donation"
+      "cancel": "Cancel",
+      "donation": "Donation",
+      "language": "Language",
+      "manageNetworks": "Manage Networks"
     }
   }
 }

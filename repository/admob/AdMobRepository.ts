@@ -2,8 +2,12 @@ import {
   AccountNetwork,
   App,
   GlobalAnalytics,
-  IAdNetwork,
-} from "@/repository/IAdNetwork";
+  IAdNetworkRepository,
+} from "@/repository/IAdNetworkRepository";
+import { storage } from "@/storage/storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+
+import { Image } from "react-native";
 
 type MoneAnaylyticsRow = {
   row: {
@@ -61,7 +65,7 @@ type MoneAnaylytics =
   | MoneAnaylyticsRow
   | MoneAnaylyticsFooter;
 
-class AdMobRepository implements IAdNetwork {
+class AdMobRepository implements IAdNetworkRepository {
   constructor(private token: string) {}
   private readonly URL_ADMOB = "https://admob.googleapis.com/v1/";
 
@@ -79,11 +83,33 @@ class AdMobRepository implements IAdNetwork {
       },
       body: options?.body ? JSON.stringify(options?.body) : undefined,
     });
+
+    if (result.status === 401) {
+      await GoogleSignin.signInSilently();
+      const { accessToken, idToken } = await GoogleSignin.getTokens();
+
+      //TODO: FOR ADD MULTIPLE NETWORKS IT'S REQUIERED USE BACKEND FOR MULTIPLE MANAGMENT REFRESH TOKEN, IN THIS 1rst VERSION i will use a native refresh
+      /*
+        CHANGE: TO BETTER DINAMIC HANDLER NO FUKING THIS 
+      */
+      this.token = accessToken;
+
+      storage.set(
+        "STORAGE::ADMOB",
+        JSON.stringify([
+          {
+            id: GoogleSignin.getCurrentUser()?.user.id ?? "",
+            token: accessToken,
+          },
+        ])
+      );
+      return this.fetch(url, options);
+    }
     /*
       TODO: On Token Expired refresh Token
     */
-
-    return await result.json();
+    const jsonResult = await result.json();
+    return jsonResult;
   }
 
   public async getListApp(accountId: string): Promise<App[]> {
@@ -102,12 +128,23 @@ class AdMobRepository implements IAdNetwork {
         appId: string;
       }[];
     }>(`accounts/${accountId}/apps`);
-
-    return apps.map(
-      ({ appId, linkedAppInfo, manualAppInfo: { displayName } }) => ({
-        id: appId,
-        name: linkedAppInfo?.displayName ?? displayName,
-      })
+    console;
+    return await Promise.all(
+      apps.map(
+        async ({
+          platform,
+          appId,
+          linkedAppInfo,
+          manualAppInfo: { displayName },
+        }) => ({
+          id: appId,
+          name: linkedAppInfo?.displayName ?? displayName,
+          icon: linkedAppInfo?.appStoreId
+            ? await this.getIconById(linkedAppInfo.appStoreId, platform)
+            : "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png",
+          platform: platform,
+        })
+      )
     );
   }
 
@@ -127,8 +164,15 @@ class AdMobRepository implements IAdNetwork {
     }));
   }
 
-  public async getAnalytics(accountId: string): Promise<GlobalAnalytics> {
-    const today = new Date();
+  public async getAnalytics({
+    startDate,
+    endDate,
+    accountId,
+  }: {
+    startDate: Date;
+    endDate: Date;
+    accountId: string;
+  }): Promise<GlobalAnalytics> {
     const data = await this.fetch<MoneAnaylytics[]>(
       `accounts/${accountId}/networkReport:generate`,
       {
@@ -137,21 +181,21 @@ class AdMobRepository implements IAdNetwork {
           reportSpec: {
             dateRange: {
               startDate: {
-                year: today.getFullYear(),
-                month: today.getMonth() + 1,
-                day: today.getDate(),
+                year: startDate.getFullYear(),
+                month: startDate.getMonth() + 1,
+                day: startDate.getDate(),
               },
               endDate: {
-                year: today.getFullYear(),
-                month: today.getMonth() + 1,
-                day: today.getDate(),
+                year: endDate.getFullYear(),
+                month: endDate.getMonth() + 1,
+                day: endDate.getDate(),
               },
             },
             dimensions: ["APP" /*", DATE", "PLATFORM", "COUNTRY"*/], //Filtar solo por lo que se necesita, si es plataforma, si es country, por fecha etc
             metrics: [
               "ESTIMATED_EARNINGS",
               "AD_REQUESTS",
-              "MATCHED_REQUESTS",
+              // "MATCHED_REQUESTS",
               "IMPRESSIONS",
             ],
             /* dimensionFilters: [
@@ -175,10 +219,7 @@ class AdMobRepository implements IAdNetwork {
     );
 
     const analytics: GlobalAnalytics = {
-      totalAdRequest: 0,
       currencyCode: header.localizationSettings.currencyCode,
-      totalImpressions: 0,
-      totalEarnings: 0,
       app: [],
     };
 
@@ -190,9 +231,7 @@ class AdMobRepository implements IAdNetwork {
       const totalImpressions = Number(
         row.metricValues.IMPRESSIONS.integerValue
       );
-      analytics.totalAdRequest += totalAdRequest;
-      analytics.totalEarnings += totalEarnings;
-      analytics.totalImpressions += totalImpressions;
+
       analytics.app.push({
         id,
         totalAdRequest,
@@ -202,6 +241,25 @@ class AdMobRepository implements IAdNetwork {
     });
 
     return analytics;
+  }
+
+  public async getIconById(id: string, platform: string): Promise<string> {
+    if (platform !== "ANDROID") {
+      return "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png";
+    }
+    const response = await fetch(
+      `https://play.google.com/store/apps/details?id=${id}`,
+      {
+        headers: { "User-Agent": "Mozilla/5.0" },
+      }
+    );
+    const html = await response.text();
+    const iconMetaMatch = html.match(
+      /<meta property="og:image" content="([^"]+)"/
+    );
+    const iconMeta = iconMetaMatch ? iconMetaMatch[1] : "";
+
+    return iconMeta;
   }
 }
 

@@ -11,7 +11,7 @@ const scopes = [
 
 GoogleSignin.configure({
   scopes: scopes,
-  // offlineAccess: false,
+  offlineAccess: false,
   iosClientId:
     "955716707860-solhabc5jfk8bi3jnk2okrm1ibqdvf39.apps.googleusercontent.com",
 });
