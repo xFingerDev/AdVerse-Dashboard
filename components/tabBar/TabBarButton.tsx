@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
 import React, { useEffect } from "react";
 import Animated, {
   interpolate,
@@ -6,18 +6,31 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
-const TabBarButton = (props: any): React.ReactNode => {
-  const { isFocused, label, routeName, color } = props;
-
+const TabBarButton = ({
+  onPress,
+  isFocused,
+  onLongPress,
+  label,
+  routeName,
+}: {
+  onPress: () => void;
+  onLongPress: () => void;
+  isFocused: boolean;
+  routeName: string;
+  label: string;
+}): React.ReactNode => {
   const scale = useSharedValue(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    scale.value = withSpring(
-      typeof isFocused === "boolean" ? (isFocused ? 1 : 0) : isFocused,
-      { duration: 350 }
-    );
+    scale.value = withSpring(Number(isFocused), { duration: 350 });
   }, [scale, isFocused]);
 
   const animatedIconStyle = useAnimatedStyle(() => {
@@ -37,16 +50,27 @@ const TabBarButton = (props: any): React.ReactNode => {
     };
   });
   return (
-    <Pressable {...props} style={styles.container}>
-      <Animated.View style={[animatedIconStyle]}>
+    <Pressable
+      onLongPress={() => onLongPress()}
+      onPress={() => onPress()}
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 4,
+      }}
+    >
+      <Animated.View style={animatedIconStyle}>
         {(() => {
           switch (routeName) {
             case "settings":
               return <Ionicons name="settings-sharp" size={26} />;
-            default:
+            case "index":
               return (
                 <MaterialCommunityIcons name="google-analytics" size={26} />
               );
+            default:
+              return <AntDesign name="unknowfile1" size={24} />;
           }
         })()}
       </Animated.View>
@@ -54,25 +78,15 @@ const TabBarButton = (props: any): React.ReactNode => {
       <Animated.Text
         style={[
           {
-            color,
             fontSize: 11,
           },
           animatedTextStyle,
         ]}
       >
-        {label}
+        {t(`${label.toLocaleLowerCase()}.header.title`)}
       </Animated.Text>
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 4,
-  },
-});
 
 export default TabBarButton;

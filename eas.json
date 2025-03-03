@@ -7,7 +7,11 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {},
+    "production": {
+      "android": {
+        "autoIncrement": true
+      }
+    },
     "development-simulator": {
       "developmentClient": true,
       "distribution": "internal",
@@ -15,5 +19,8 @@
         "simulator": true
       }
     }
+  },
+  "cli": {
+    "appVersionSource": "remote"
   }
 }
