@@ -1,8 +1,4 @@
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useCallback, useEffect, useRef } from "react";
 import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 
@@ -24,7 +20,7 @@ const BottonSheet: React.FC<BottonSheetProps> = ({
   }, []);
 
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && bottomSheetModalRef.current) {
       handlePresentModalPress();
     } else {
       bottomSheetModalRef.current?.dismiss();
@@ -32,9 +28,8 @@ const BottonSheet: React.FC<BottonSheetProps> = ({
   }, [isVisible, handlePresentModalPress]);
 
   const handleClose = useCallback(() => {
-    bottomSheetModalRef.current?.close();
-    onClose?.();
-  }, [onClose]);
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
 
   if (!isVisible) return null;
 
@@ -44,7 +39,6 @@ const BottonSheet: React.FC<BottonSheetProps> = ({
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>
       <BottomSheetModal
-        //snapPoints={["50%"]}
         ref={bottomSheetModalRef}
         onDismiss={onClose}
         backgroundStyle={styles.modalBackground}

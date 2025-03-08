@@ -11,23 +11,46 @@ export type AplicationAnalytic = {
   totalAdRequest: number;
 };
 
-export enum AnalyticType {
+export enum AnalyticTypeEnum {
   today = "today",
   yesterday = "yesterday",
   sevenDays = "sevenDays",
   fourteenDays = "fourteenDays",
   oneMonth = "oneMonth",
   oneYear = "oneYear",
-
-  // custom = "custom",
 }
-/*  | "today"
-  | "yesterday"
-  | "7days"
-  | "14days"
-  | "1month"
-  | "1year";*/
-//| "custom";
+
+export function isAnalyticTypeDate(
+  type: AnalyticType
+): type is AnalyticTypeDate {
+  return (type as AnalyticTypeDate).start !== undefined;
+}
+
+export function isAnalyticTypeEnum(
+  type: AnalyticType
+): type is AnalyticTypeEnum {
+  return Object.values(AnalyticTypeEnum).includes(type as AnalyticTypeEnum);
+}
+
+export const parseAnalyticType = (analyticsTypeStr?: string): AnalyticType => {
+  try {
+    const parsedAnalyticType = JSON.parse(analyticsTypeStr ?? "{}");
+
+    if (isAnalyticTypeEnum(parsedAnalyticType)) {
+      return parsedAnalyticType;
+    }
+
+    return {
+      start: new Date(parsedAnalyticType.start),
+      end: new Date(parsedAnalyticType.end),
+    };
+  } catch (error) {
+    return AnalyticTypeEnum.today;
+  }
+};
+
+export type AnalyticTypeDate = { start: Date; end: Date };
+export type AnalyticType = AnalyticTypeEnum | AnalyticTypeDate;
 
 export interface INetworkAnalytic {
   id: string;

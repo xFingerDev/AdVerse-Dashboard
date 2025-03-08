@@ -5,9 +5,8 @@ import {
   IAdNetworkRepository,
 } from "@/repository/IAdNetworkRepository";
 import { storage } from "@/storage/storage";
+import { getIconById } from "@/utils/getIconById";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-
-import { Image } from "react-native";
 
 type MoneAnaylyticsRow = {
   row: {
@@ -139,13 +138,66 @@ class AdMobRepository implements IAdNetworkRepository {
         }) => ({
           id: appId,
           name: linkedAppInfo?.displayName ?? displayName,
-          icon: linkedAppInfo?.appStoreId
-            ? await this.getIconById(linkedAppInfo.appStoreId, platform)
-            : "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png",
+          icon: await getIconById({
+            appId: linkedAppInfo?.appStoreId ?? "",
+            platform,
+          }),
           platform: platform,
         })
       )
     );
+  }
+
+  async getAppDetail({
+    accountId,
+    appId,
+    startDate,
+    endDate,
+  }: {
+    accountId: string;
+    appId: string;
+    startDate: Date;
+    endDate: Date;
+  }): Promise<any[]> {
+    const data = await this.fetch<MoneAnaylytics[]>(
+      `accounts/${accountId}/networkReport:generate`,
+      {
+        method: "POST",
+        body: {
+          reportSpec: {
+            dateRange: {
+              startDate: {
+                year: startDate.getFullYear(),
+                month: startDate.getMonth() + 1,
+                day: startDate.getDate(),
+              },
+              endDate: {
+                year: endDate.getFullYear(),
+                month: endDate.getMonth() + 1,
+                day: endDate.getDate(),
+              },
+            },
+            dimensions: ["APP", "DATE", "PLATFORM", "COUNTRY"],
+            metrics: [
+              "ESTIMATED_EARNINGS",
+              "AD_REQUESTS",
+              // "MATCHED_REQUESTS",
+              "IMPRESSIONS",
+            ],
+            dimensionFilters: [
+              {
+                dimension: "APP",
+                matchesAny: {
+                  values: [appId],
+                },
+              },
+            ],
+          },
+        },
+      }
+    );
+
+    return [];
   }
 
   public async getListAccounts(): Promise<AccountNetwork[]> {
@@ -241,25 +293,6 @@ class AdMobRepository implements IAdNetworkRepository {
     });
 
     return analytics;
-  }
-
-  public async getIconById(id: string, platform: string): Promise<string> {
-    if (platform !== "ANDROID") {
-      return "https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png";
-    }
-    const response = await fetch(
-      `https://play.google.com/store/apps/details?id=${id}`,
-      {
-        headers: { "User-Agent": "Mozilla/5.0" },
-      }
-    );
-    const html = await response.text();
-    const iconMetaMatch = html.match(
-      /<meta property="og:image" content="([^"]+)"/
-    );
-    const iconMeta = iconMetaMatch ? iconMetaMatch[1] : "";
-
-    return iconMeta;
   }
 }
 

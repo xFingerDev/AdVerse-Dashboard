@@ -19,7 +19,7 @@ module.exports = {
         process.env.GOOGLE_SERVICES_PLIST || "./GoogleService-Info.plist",
       supportsTablet: true,
       bundleIdentifier:
-        process.env.PROJECT_BUNDLE_ID || "dev.communitybakery.adverse",
+        process.env.PROJECT_BUNDLE_ID || "com.communitybakery.adverse",
       infoPlist: {
         CFBundleURLTypes: [
           {
@@ -37,7 +37,8 @@ module.exports = {
       },
     },
     android: {
-      package: process.env.PROJECT_BUNDLE_ID || "dev.communitybakery.adverse",
+      runtimeVersion: "1.0.1",
+      package: process.env.PROJECT_BUNDLE_ID || "com.communitybakery.adverse",
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff",

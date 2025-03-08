@@ -5,11 +5,7 @@ import {
   IAdNetworkRepository,
 } from "../IAdNetworkRepository";
 import { IApp, INetwork } from "../INetwork";
-import {
-  AnalyticType,
-  AplicationAnalytic,
-  INetworkAnalytic,
-} from "../INetworkAnalytic";
+import { AplicationAnalytic, INetworkAnalytic } from "../INetworkAnalytic";
 
 export class AdMobNetworkAnalytic implements INetworkAnalytic {
   storageAPPSKey: string = "STORAGE::ADMOB::APPS";

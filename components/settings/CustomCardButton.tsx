@@ -1,13 +1,7 @@
-import React from "react";
-import {
-  Card,
-  Text,
-  View,
-  Colors as ColorsRUI,
-  Shadows,
-} from "react-native-ui-lib";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 import { Animated, StyleProp, ViewStyle } from "react-native";
+import { Card, Colors as ColorsRUI, Text, View } from "react-native-ui-lib";
 
 interface CustomCardButtonProps {
   label: string;

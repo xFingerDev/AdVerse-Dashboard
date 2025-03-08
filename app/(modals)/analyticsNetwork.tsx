@@ -1,27 +1,22 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView, ScrollView } from "react-native";
 
-import EditScreenInfo from "@/components/EditScreenInfo";
-import { useEffect, useState } from "react";
 import BottonSheet from "@/components/settings/BottonSheet";
 import CustomCardButton from "@/components/settings/CustomCardButton";
-import { Card, Colors, Text, View } from "react-native-ui-lib";
 import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
-import { useTranslation } from "react-i18next";
+import { INetworkAnalytic } from "@/repository/INetworkAnalytic";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Image } from "react-native";
-import { use } from "i18next";
-import { INetwork } from "@/repository/INetwork";
-import { INetworkAnalytic } from "@/repository/INetworkAnalytic";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
-  withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { Card, Colors, Text, View } from "react-native-ui-lib";
 
 export default function AnalyticsNetwork() {
   const [visibleAdNetworks, setVisibleAdNetworks] = useState(false);

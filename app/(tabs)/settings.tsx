@@ -1,18 +1,12 @@
-import { useState } from "react";
-import { useAdNetworkManager } from "../../contexts/AdNetworkManagerContext";
-import { useTranslation } from "react-i18next";
-import { Card, Colors as ColorsRUI, Text, View } from "react-native-ui-lib";
-import { Alert, Linking, SafeAreaView, ScrollView } from "react-native";
 import Constants from "expo-constants";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Alert, Linking, SafeAreaView, ScrollView } from "react-native";
+import { Card, Colors as ColorsRUI, Text, View } from "react-native-ui-lib";
 
 import BottonSheet from "@/components/settings/BottonSheet";
 import CustomCardButton from "@/components/settings/CustomCardButton";
-import {
-  useNavigation,
-  useNavigationContainerRef,
-  useRouter,
-} from "expo-router";
-import { useTheme } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 
 export default function SettingsScreen() {
   const router = useRouter();

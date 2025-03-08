@@ -21,6 +21,12 @@ export type GlobalAnalytics = {
 };
 
 export interface IAdNetworkRepository {
+  getAppDetail(dto: {
+    accountId: string;
+    appId: string;
+    startDate: Date;
+    endDate: Date;
+  }): Promise<any[]>;
   getListApp(accountId: string): Promise<App[]>;
   getListAccounts(): Promise<AccountNetwork[]>;
   getAnalytics(dto: {

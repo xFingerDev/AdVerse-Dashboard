@@ -1,9 +1,9 @@
-import { View, Card, Text, Colors } from "react-native-ui-lib";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { currencySymbols } from "@/constants/CurrencySymbols";
 import { AplicationAnalytic } from "@/repository/INetworkAnalytic";
-import { useTranslation } from "react-i18next";
 import { formatNumericAbbreviation } from "@/utils/formatConcurency";
+import { useTranslation } from "react-i18next";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { Card, Colors, Text, View } from "react-native-ui-lib";
 
 type AnalyticsSummaryProps = {
   analytics: AplicationAnalytic[] | null;

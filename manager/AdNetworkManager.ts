@@ -1,16 +1,15 @@
-import AdMobRepository from "@/repository/admob/AdMobRepository";
-import { IApp, INetwork } from "@/repository/INetwork";
-import { IAdNetworkRepository } from "@/repository/IAdNetworkRepository";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { adMobNetworkInstance } from "@/repository/admob/AdMobNetwork";
-import { unityAdsNetworkInstance } from "@/repository/unityAds/UnityAdsNetwork";
+import { adsenseNetworkInstance } from "@/repository/adsense/AdsenseNetwork";
 import { facebookAdsNetworkInstance } from "@/repository/facebook/UnityAdsNetwork";
+import { IApp, INetwork } from "@/repository/INetwork";
 import {
   AnalyticType,
+  AnalyticTypeEnum,
   AplicationAnalytic,
   INetworkAnalytic,
+  isAnalyticTypeDate,
 } from "@/repository/INetworkAnalytic";
-import { adsenseNetworkInstance } from "@/repository/adsense/AdsenseNetwork";
+import { unityAdsNetworkInstance } from "@/repository/unityAds/UnityAdsNetwork";
 
 /*
  Add Layer for dynamic implementation betwen repositorys and 3th party networks
@@ -59,38 +58,62 @@ export default class AdNetworkManager {
   }
 
   public async getAnalyticList(
-    type: AnalyticType,
-    customDate?: { startDate: Date; endDate: Date }
+    type: AnalyticType
   ): Promise<AplicationAnalytic[]> {
-    let startDate = customDate?.startDate ?? new Date();
-    let endDate = customDate?.endDate ?? new Date();
+    try {
+      const { startDate, endDate } = this.calculateDateRange(type);
+
+      const analytics = await Promise.all(
+        this.repositories.map((repo) =>
+          repo.getListAnalytics({ startDate, endDate }).catch((error) => {
+            console.error(
+              `Failed to fetch analytics for repository: ${repo.id}`,
+              error
+            );
+            return [];
+          })
+        )
+      );
+
+      this.needRefresh = false;
+      return analytics.flat();
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+      return [];
+    }
+  }
+
+  private calculateDateRange(type: AnalyticType): {
+    startDate: Date;
+    endDate: Date;
+  } {
+    const endDate = new Date();
+    const startDate = new Date();
+
+    if (isAnalyticTypeDate(type)) {
+      return { startDate: type.start, endDate: type.end };
+    }
+
     switch (type) {
-      case AnalyticType.yesterday:
-        startDate.setDate(startDate.getDate() - 1);
+      case AnalyticTypeEnum.yesterday:
+        startDate.setDate(endDate.getDate() - 1);
         endDate.setDate(endDate.getDate() - 1);
         break;
-      case AnalyticType.sevenDays:
-        startDate.setDate(startDate.getDate() - 7);
+      case AnalyticTypeEnum.sevenDays:
+        startDate.setDate(endDate.getDate() - 7);
         break;
-      case AnalyticType.fourteenDays:
-        startDate.setDate(startDate.getDate() - 14);
+      case AnalyticTypeEnum.fourteenDays:
+        startDate.setDate(endDate.getDate() - 14);
         break;
-      case AnalyticType.oneMonth:
-        startDate.setMonth(startDate.getMonth() - 1);
+      case AnalyticTypeEnum.oneMonth:
+        startDate.setMonth(endDate.getMonth() - 1);
         break;
-      case AnalyticType.oneYear:
-        startDate.setFullYear(startDate.getFullYear() - 1);
+      case AnalyticTypeEnum.oneYear:
+        startDate.setFullYear(endDate.getFullYear() - 1);
         break;
     }
 
-    const result = await Promise.all(
-      this.repositories.map((repo) =>
-        repo.getListAnalytics({ startDate, endDate })
-      )
-    ).then((data) => data.flat());
-    this.needRefresh = false;
-
-    return result;
+    return { startDate, endDate };
   }
 
   public loadedNetworks(): INetworkAnalytic[] {

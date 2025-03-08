@@ -13,22 +13,16 @@ import { useColorScheme } from "@/components/useColorScheme";
 import "@/constants/Google";
 import { AdNetworkManagerProvider } from "@/contexts/AdNetworkManagerContext";
 import "@/i18n/index";
-import { Colors } from "react-native-ui-lib";
 import {
-  useFonts,
   Nunito_400Regular,
   Nunito_700Bold,
+  useFonts,
 } from "@expo-google-fonts/nunito";
-export { ErrorBoundary } from "expo-router";
-import { ThemeManager } from "react-native-ui-lib";
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Appearance, Button, StyleSheet } from "react-native";
-import SheetDonation from "@/components/settings/BottonSheet";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { Appearance, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Colors, ThemeManager } from "react-native-ui-lib";
+export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",

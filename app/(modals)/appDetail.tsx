@@ -1,32 +1,23 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView, ScrollView } from "react-native";
 
-import EditScreenInfo from "@/components/EditScreenInfo";
-import { useEffect, useState } from "react";
-import BottonSheet from "@/components/settings/BottonSheet";
-import CustomCardButton from "@/components/settings/CustomCardButton";
-import { Card, Colors, Text, View } from "react-native-ui-lib";
+import AnalyticsFilter from "@/components/analytics/AnalyticsFilter";
+import AnalyticsSummary from "@/components/analytics/AnalyticsSummary";
 import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
-import { useTranslation } from "react-i18next";
+import { AnalyticType, parseAnalyticType } from "@/repository/INetworkAnalytic";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Image } from "react-native";
-import { use } from "i18next";
-import { INetwork } from "@/repository/INetwork";
-import { INetworkAnalytic } from "@/repository/INetworkAnalytic";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
-import { useLocalSearchParams, useSearchParams } from "expo-router/build/hooks";
+import { useLocalSearchParams } from "expo-router/build/hooks";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Text, View } from "react-native-ui-lib";
 
 export default function AppDetail() {
   const { appId, analyticType } = useLocalSearchParams();
   const adNetworkManager = useAdNetworkManager();
+
+  const [rangeDay, setRangeDays] = useState<AnalyticType>(() =>
+    parseAnalyticType(analyticType?.toString())
+  );
 
   const [appData] = useState(() =>
     adNetworkManager.getAplicationDataById(appId.toString())
@@ -38,7 +29,6 @@ export default function AppDetail() {
     }
   }, [appId]);
 
-  console.log({ appId, analyticType });
   const router = useRouter();
 
   const { t } = useTranslation();
@@ -54,7 +44,7 @@ export default function AppDetail() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <View row marginT-16 marginL-20 centerV>
+        <View row marginV-16 marginL-20 centerV>
           <Ionicons
             name="chevron-back-outline"
             size={24}
@@ -76,32 +66,9 @@ export default function AppDetail() {
           </Text>
         </View>
 
+        <AnalyticsFilter rangeDay={rangeDay} setRangeDays={setRangeDays} />
         <View margin-16>
-          <Card>
-            <View padding-16>
-              <View row centerV>
-                <Image
-                  source={{ uri: appData.icon }}
-                  style={{ width: 50, height: 50, borderRadius: 10 }}
-                />
-                <View marginL-16>
-                  <View marginT-16>
-                    <Text text70>
-                      Platform:{" "}
-                      <Text style={{ fontWeight: "bold" }}>
-                        {appData.platform}
-                      </Text>
-                    </Text>
-
-                    <Text text70 marginT-8>
-                      Created:{" "}
-                      <Text style={{ fontWeight: "bold" }}>{appData.id}</Text>
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </Card>
+          <AnalyticsSummary analytics={null}></AnalyticsSummary>
         </View>
       </ScrollView>
     </SafeAreaView>

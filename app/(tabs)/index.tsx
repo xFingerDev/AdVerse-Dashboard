@@ -1,24 +1,27 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
 
-import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native-ui-lib";
-import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
-import {
-  AnalyticType,
-  AplicationAnalytic,
-} from "@/repository/INetworkAnalytic";
 import AnalyticsFilter from "@/components/analytics/AnalyticsFilter";
 import AnalyticsSummary from "@/components/analytics/AnalyticsSummary";
 import ApplicationsList from "@/components/analytics/ApplicationsList";
+import {
+  AnalyticType,
+  AnalyticTypeEnum,
+  AplicationAnalytic,
+} from "@/repository/INetworkAnalytic";
 import { useFocusEffect } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
+import { Text, View } from "react-native-ui-lib";
 
 export default function TabOneScreen() {
   const adNetworkManager = useAdNetworkManager();
   const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
-  const [rangeDay, setRangeDays] = useState<AnalyticType>(AnalyticType.today);
+  const [rangeDay, setRangeDays] = useState<AnalyticType>(
+    AnalyticTypeEnum.today
+  );
   const [analytics, setAnalytics] = useState<AplicationAnalytic[] | null>(null);
 
   const onRefresh = async () => {

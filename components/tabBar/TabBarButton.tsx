@@ -1,17 +1,17 @@
-import { Pressable } from "react-native";
+import {
+  AntDesign,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Pressable } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import {
-  AntDesign,
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
-import { useTranslation } from "react-i18next";
 import { Colors } from "react-native-ui-lib";
 
 const TabBarButton = ({

@@ -1,4 +1,3 @@
-import { IAdNetworkRepository } from "./IAdNetworkRepository";
 import { INetworkAnalytic } from "./INetworkAnalytic";
 
 export interface IApp {

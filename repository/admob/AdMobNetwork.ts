@@ -1,12 +1,10 @@
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { IAdNetworkRepository } from "../IAdNetworkRepository";
-import { IApp, INetwork } from "../INetwork";
-import AdMobRepository from "./AdMobRepository";
 import { storage } from "@/storage/storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { Alert } from "react-native";
+import { INetwork } from "../INetwork";
 import { INetworkAnalytic } from "../INetworkAnalytic";
 import { AdMobNetworkAnalytic } from "./AdMobNetworkAnalytic";
-import { Alert } from "react-native";
-import { t } from "i18next";
+import AdMobRepository from "./AdMobRepository";
 
 type StorageAdmobValue = {
   id: string;

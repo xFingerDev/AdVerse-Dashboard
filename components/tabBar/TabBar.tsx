@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-} from "react-native";
 import React from "react";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { Platform } from "react-native";
 
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Card, Colors } from "react-native-ui-lib";
