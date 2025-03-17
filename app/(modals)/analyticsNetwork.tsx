@@ -117,6 +117,15 @@ export default function AnalyticsNetwork() {
         </View>
 
         <View margin-16>
+          {adNetworkManager.loadedNetworks().length === 0 && (
+            <View center marginV-32>
+              <Ionicons name="apps-outline" size={48} color={Colors.grey40} />
+              <Text text70 grey40 marginT-8>
+                {t("networks.manage.empty")}
+              </Text>
+            </View>
+          )}
+
           {adNetworkManager.loadedNetworks().map((network) => {
             return (
               <Card
@@ -175,6 +184,35 @@ export default function AnalyticsNetwork() {
                 </View>
 
                 <View padding-16>
+                  {network.getApps().length === 0 && (
+                    <View
+                      row
+                      centerV
+                      marginB-4
+                      style={{
+                        backgroundColor: Colors.grey70,
+                        padding: 16,
+                        borderRadius: 12,
+                        opacity: 0.8,
+                      }}
+                    >
+                      <Ionicons
+                        name="information-circle-outline"
+                        size={32}
+                        color={Colors.grey40}
+                        style={{ marginRight: 8 }}
+                      />
+                      <Text
+                        grey40
+                        style={{
+                          fontSize: 16,
+                          fontWeight: "500",
+                        }}
+                      >
+                        {t("networks.manage.noApps")}
+                      </Text>
+                    </View>
+                  )}
                   {network.getApps().map((app) => (
                     <View row centerV marginB-4 key={app.id}>
                       <Image

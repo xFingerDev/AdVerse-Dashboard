@@ -17,7 +17,7 @@ type ApplicationsDetailProps = {
   content: string;
 };
 
-const ApplicationsDetail: React.FC<ApplicationsDetailProps> = ({
+export const ApplicationsDetail: React.FC<ApplicationsDetailProps> = ({
   title,
   content,
 }) => {

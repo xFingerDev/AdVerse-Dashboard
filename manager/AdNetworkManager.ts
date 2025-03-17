@@ -13,6 +13,7 @@ import { unityAdsNetworkInstance } from "@/repository/unityAds/UnityAdsNetwork";
 
 /*
  Add Layer for dynamic implementation betwen repositorys and 3th party networks
+ and refactor this code for more eficient and less chaos
 */
 export default class AdNetworkManager {
   public repositories: INetworkAnalytic[] = [];
@@ -121,6 +122,17 @@ export default class AdNetworkManager {
   }
 
   public getAplicationDataById(id: string): IApp | null {
+    //TODO: handle multiple repositories
     return this.repositories[0].getApps().find((app) => app.id === id) ?? null;
+  }
+  public async getAplicationAnalyticsById(type: AnalyticType, id: string) {
+    const { startDate, endDate } = this.calculateDateRange(type);
+
+    //TODO: handle multiple repositories
+    return await this.repositories[0].getAnalyticsApp({
+      startDate,
+      endDate,
+      appId: id,
+    });
   }
 }

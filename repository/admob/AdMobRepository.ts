@@ -1,6 +1,7 @@
 import {
   AccountNetwork,
   App,
+  AppAnalytics,
   GlobalAnalytics,
   IAdNetworkRepository,
 } from "@/repository/IAdNetworkRepository";
@@ -17,6 +18,12 @@ type MoneAnaylyticsRow = {
       APP: {
         value: string; // "ca-app-pub"
         displayLabel: string;
+      };
+      COUNTRY: {
+        value: string;
+      };
+      AD_UNIT?: {
+        value: string;
       };
     };
     metricValues: {
@@ -148,7 +155,7 @@ class AdMobRepository implements IAdNetworkRepository {
     );
   }
 
-  async getAppDetail({
+  async getAnalyticsApp({
     accountId,
     appId,
     startDate,
@@ -158,7 +165,7 @@ class AdMobRepository implements IAdNetworkRepository {
     appId: string;
     startDate: Date;
     endDate: Date;
-  }): Promise<any[]> {
+  }): Promise<AppAnalytics> {
     const data = await this.fetch<MoneAnaylytics[]>(
       `accounts/${accountId}/networkReport:generate`,
       {
@@ -177,7 +184,11 @@ class AdMobRepository implements IAdNetworkRepository {
                 day: endDate.getDate(),
               },
             },
-            dimensions: ["APP", "DATE", "PLATFORM", "COUNTRY"],
+            dimensions: [
+              /*"APP",*/ "DATE",
+              /* "PLATFORM",*/ "COUNTRY",
+              "AD_UNIT",
+            ],
             metrics: [
               "ESTIMATED_EARNINGS",
               "AD_REQUESTS",
@@ -197,7 +208,41 @@ class AdMobRepository implements IAdNetworkRepository {
       }
     );
 
-    return [];
+    const { header } = data.find(
+      (item): item is MoneAnaylyticsHeader => "header" in item
+    )!;
+    const rowData = data.filter(
+      (item): item is MoneAnaylyticsRow => "row" in item
+    );
+
+    const result: {
+      country: string;
+      date: Date;
+      totalAdRequest: number;
+      totalEarnings: number;
+      totalImpressions: number;
+      adId: string;
+    }[] = rowData.map(({ row }) => {
+      const totalAdRequest = Number(row.metricValues.AD_REQUESTS.integerValue);
+      const totalEarnings =
+        Number(row.metricValues.ESTIMATED_EARNINGS.microsValue) / 1000000;
+      const totalImpressions = Number(
+        row.metricValues.IMPRESSIONS.integerValue
+      );
+      return {
+        country: row.dimensionValues.COUNTRY.value,
+        date: new Date(Number(row.dimensionValues.DATE?.value)),
+        totalAdRequest,
+        totalEarnings,
+        totalImpressions,
+        adId: row.dimensionValues.AD_UNIT?.value ?? "",
+      };
+    });
+
+    return {
+      currencyCode: header.localizationSettings.currencyCode,
+      analytics: result,
+    };
   }
 
   public async getListAccounts(): Promise<AccountNetwork[]> {

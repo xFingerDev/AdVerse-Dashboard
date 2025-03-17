@@ -20,13 +20,25 @@ export type GlobalAnalytics = {
   }[];
 };
 
+export type AppAnalytics = {
+  currencyCode: string;
+  analytics: {
+    country: string;
+    date: Date;
+    totalAdRequest: number;
+    totalEarnings: number;
+    totalImpressions: number;
+    adId: string;
+  }[];
+};
+
 export interface IAdNetworkRepository {
-  getAppDetail(dto: {
+  getAnalyticsApp(dto: {
     accountId: string;
     appId: string;
     startDate: Date;
     endDate: Date;
-  }): Promise<any[]>;
+  }): Promise<AppAnalytics>;
   getListApp(accountId: string): Promise<App[]>;
   getListAccounts(): Promise<AccountNetwork[]>;
   getAnalytics(dto: {

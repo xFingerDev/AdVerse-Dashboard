@@ -1,3 +1,21 @@
+/**
+ * Formats a number into a human-readable string with metric suffixes (K, M, B, T).
+ * This custom implementation was created because Intl.NumberFormat has inconsistent behavior on iOS devices.
+ *
+ * @param num - The number to format
+ * @param decimal - Whether to include decimal places in the output (defaults to true)
+ * @returns A formatted string with appropriate metric suffix
+ *
+ * @example
+ * formatNumericAbbreviation(1234567, true) // returns "1.23M"
+ * formatNumericAbbreviation(1000, false) // returns "1K"
+ * formatNumericAbbreviation(999) // returns "999"
+ *
+ * @remarks
+ * - Handles numbers from 0 to trillions
+ * - Uses suffixes: K (thousands), M (millions), B (billions), T (trillions)
+ * - When decimal is true, maintains precision of 3 significant digits
+ */
 export const formatNumericAbbreviation = (
   num: number,
   decimal: boolean = true
@@ -9,7 +27,7 @@ export const formatNumericAbbreviation = (
     { threshold: 1e3, suffix: "K" },
   ];
 
-  if (num === 0) return "0";
+  if (num === 0) return decimal ? "0.00" : "0";
 
   const format = formats.find((f) => num >= f.threshold);
   if (format) {

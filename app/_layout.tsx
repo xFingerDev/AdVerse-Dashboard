@@ -18,12 +18,12 @@ import {
   Nunito_700Bold,
   useFonts,
 } from "@expo-google-fonts/nunito";
+
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Appearance, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Colors, ThemeManager } from "react-native-ui-lib";
 export { ErrorBoundary } from "expo-router";
-
 export const unstable_settings = {
   initialRouteName: "(tabs)",
 };

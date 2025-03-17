@@ -1,7 +1,7 @@
+import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
 import React, { useCallback, useState } from "react";
 
-import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
-
+import AnalyticsEmpty from "@/components/analytics/AnalyticsEmpty";
 import AnalyticsFilter from "@/components/analytics/AnalyticsFilter";
 import AnalyticsSummary from "@/components/analytics/AnalyticsSummary";
 import ApplicationsList from "@/components/analytics/ApplicationsList";
@@ -45,6 +45,7 @@ export default function TabOneScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
+        style={{ flex: 1 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -66,7 +67,25 @@ export default function TabOneScreen() {
         <AnalyticsFilter rangeDay={rangeDay} setRangeDays={setRangeDays} />
 
         <View margin-16>
-          <AnalyticsSummary analytics={analytics} />
+          <AnalyticsSummary
+            totalAdRequests={
+              analytics
+                ? analytics.reduce((acc, app) => acc + app.totalAdRequest, 0)
+                : 0
+            }
+            totalEarnings={
+              analytics
+                ? analytics.reduce((acc, app) => acc + app.totalEarnings, 0) /
+                  100
+                : 0
+            }
+            totalImpressions={
+              analytics
+                ? analytics.reduce((acc, app) => acc + app.totalImpressions, 0)
+                : 0
+            }
+            currencyCode={analytics?.[0].currencyCode ?? ""}
+          />
           <Text
             text40BO
             marginV-16
@@ -77,6 +96,7 @@ export default function TabOneScreen() {
           >
             {t("analytics.applications.title")}
           </Text>
+          {!analytics?.length && <AnalyticsEmpty />}
           <ApplicationsList analytics={analytics} analyticType={rangeDay} />
         </View>
       </ScrollView>

@@ -1,12 +1,14 @@
 import { currencySymbols } from "@/constants/CurrencySymbols";
-import { AplicationAnalytic } from "@/repository/INetworkAnalytic";
 import { formatNumericAbbreviation } from "@/utils/formatConcurency";
 import { useTranslation } from "react-i18next";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Card, Colors, Text, View } from "react-native-ui-lib";
 
 type AnalyticsSummaryProps = {
-  analytics: AplicationAnalytic[] | null;
+  totalEarnings: number;
+  totalImpressions: number;
+  totalAdRequests: number;
+  currencyCode: string;
 };
 
 type AnalyticsCardProps = {
@@ -49,27 +51,21 @@ const AnalyticsCard: React.FC<AnalyticsCardProps> = ({
   );
 };
 
-const AnalyticsSummary: React.FC<AnalyticsSummaryProps> = ({ analytics }) => {
+const AnalyticsSummary: React.FC<AnalyticsSummaryProps> = ({
+  totalAdRequests,
+  totalImpressions,
+  totalEarnings,
+  currencyCode,
+}) => {
   const { t } = useTranslation();
 
-  const totalEarnings = analytics
-    ? analytics.reduce((acc, app) => acc + app.totalEarnings, 0) / 100
-    : 0;
-  const totalImpressions = analytics
-    ? analytics.reduce((acc, app) => acc + app.totalImpressions, 0)
-    : 0;
-  const totalAdRequests = analytics
-    ? analytics.reduce((acc, app) => acc + app.totalAdRequest, 0)
-    : 0;
   const eCPM =
     totalImpressions > 0
       ? ((totalEarnings / totalImpressions) * 1000).toFixed(2)
       : 0;
 
   const currentSymbol =
-    currencySymbols?.[
-      analytics?.[0]?.currencyCode as keyof typeof currencySymbols
-    ] ?? "";
+    currencySymbols?.[currencyCode as keyof typeof currencySymbols] ?? "";
 
   return (
     <Animated.View entering={FadeIn} exiting={FadeOut}>

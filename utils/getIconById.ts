@@ -8,7 +8,6 @@ export const getIconById = async ({
   appId: string;
   platform: string;
 }): Promise<string> => {
-  console.log({ appId, platform });
   switch (platform) {
     case "ANDROID":
       return await getIconByIdAndroid(appId);

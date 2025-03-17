@@ -1,3 +1,4 @@
+import { AppAnalytics } from "./IAdNetworkRepository";
 import { IApp, INetwork } from "./INetwork";
 
 export type AplicationAnalytic = {
@@ -61,4 +62,9 @@ export interface INetworkAnalytic {
     startDate: Date;
     endDate: Date;
   }): Promise<AplicationAnalytic[]>;
+  getAnalyticsApp(dto: {
+    appId: string;
+    startDate: Date;
+    endDate: Date;
+  }): Promise<AppAnalytics | null>;
 }

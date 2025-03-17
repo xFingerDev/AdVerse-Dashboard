@@ -1,6 +1,7 @@
 import { storage } from "@/storage/storage";
 import {
   AccountNetwork,
+  AppAnalytics,
   GlobalAnalytics,
   IAdNetworkRepository,
 } from "../IAdNetworkRepository";
@@ -9,7 +10,7 @@ import { AplicationAnalytic, INetworkAnalytic } from "../INetworkAnalytic";
 
 export class AdMobNetworkAnalytic implements INetworkAnalytic {
   storageAPPSKey: string = "STORAGE::ADMOB::APPS";
-  apps: IApp[] /*| null*/ = [];
+  apps: (IApp & { accountId: string })[] /*| null*/ = [];
   accounts: AccountNetwork[] = [];
   id: string;
   constructor(
@@ -43,9 +44,13 @@ export class AdMobNetworkAnalytic implements INetworkAnalytic {
     this.accounts.forEach((account) => {
       if (!this.apps.length)
         promises.push(
-          this.repository
-            .getListApp(account.accountId)
-            .then((data) => (this.apps = data))
+          this.repository.getListApp(account.accountId).then(
+            (data) =>
+              (this.apps = data.map((data) => ({
+                ...data,
+                accountId: account.accountId,
+              })))
+          )
         );
     });
 
@@ -100,5 +105,25 @@ export class AdMobNetworkAnalytic implements INetworkAnalytic {
         })
       )
       .flat();
+  }
+
+  async getAnalyticsApp({
+    appId,
+    startDate,
+    endDate,
+  }: {
+    appId: string;
+    startDate: Date;
+    endDate: Date;
+  }): Promise<AppAnalytics | null> {
+    const app = this.apps.find(({ id }) => id === appId);
+    if (!app) return null;
+
+    return await this.repository.getAnalyticsApp({
+      appId: app.id,
+      accountId: app.accountId,
+      startDate: startDate,
+      endDate: endDate,
+    });
   }
 }

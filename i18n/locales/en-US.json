@@ -4,7 +4,8 @@
       "title": "Analytics"
     },
     "applications": {
-      "title": "Applications"
+      "title": "Applications",
+      "empty": "No Analytics available"
     },
     "summary": {
       "earnings": "Earnings",
@@ -22,6 +23,9 @@
         "oneYear": "1 year",
         "custom": "Custom"
       }
+    },
+    "countries": {
+      "title": "Countries"
     }
   },
   "networks": {
@@ -31,7 +35,9 @@
       },
       "buttons": {
         "add": "Add Network"
-      }
+      },
+      "empty": "No networks available",
+      "noApps": "No applications found"
     }
   },
   "settings": {

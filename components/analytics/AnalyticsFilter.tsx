@@ -3,11 +3,12 @@ import {
   AnalyticTypeEnum,
   isAnalyticTypeDate,
 } from "@/repository/INetworkAnalytic";
-import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { MarkedDates } from "react-native-calendars/src/types";
+import { DateData, MarkedDates } from "react-native-calendars/src/types";
 import { Button, Chip, Colors, Text, View } from "react-native-ui-lib";
 import BottonSheet from "../settings/BottonSheet";
 
@@ -24,14 +25,20 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
 
   const [visibleCalendar, setVisibleCalendar] = useState(false);
   const CalendarSheet: React.FC = () => {
-    const [disableNextMonth, setDisableNextMonth] = useState(false);
+    const [disableNextMonth, setDisableNextMonth] = useState(true);
 
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+    const selectedDate = useRef<DateData>({
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+      day: new Date().getDate(),
+      timestamp: new Date().getTime(),
+      dateString: new Date().toISOString().split("T")[0],
+    });
 
     const handleDayPress = (day: number) => {
       setSelectedDates((prev) => {
         const newDates = [day, ...prev.map((date) => date.getTime())];
-        console.log(newDates);
         if (newDates.length > 2) {
           newDates.pop();
         }
@@ -43,11 +50,15 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
     };
 
     const generateMarkedDates = (): MarkedDates => {
-      return {
-        ...[...selectedDates]
-          .sort((a, b) => a.getTime() - b.getTime())
-          .reduce((acc, date, index, array) => {
-            if (array.length < 2) {
+      const sortDate = [...selectedDates].sort(
+        (a, b) => a.getTime() - b.getTime()
+      );
+
+      if (selectedDates.length < 2) {
+        return {
+          ...sortDate
+            .sort((a, b) => a.getTime() - b.getTime())
+            .reduce((acc, date, index, array) => {
               return {
                 [date.toISOString().split("T")[0]]: {
                   color: "#ec85c7",
@@ -56,38 +67,59 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
                   textColor: "white",
                 },
               };
-            }
+            }, {}),
+        };
+      }
 
-            const [startDate, endDate] = array;
+      const [startDate, endDate] = sortDate;
+      const dates: { [key: string]: any } = {};
 
-            const dates: { [key: string]: any } = {};
-            for (
-              const d = new Date(startDate);
-              d <= endDate;
-              d.setDate(d.getDate() + 1)
-            ) {
-              const formattedDate = d.toISOString().split("T")[0];
-              dates[formattedDate] = {
-                startingDay: d.getTime() === startDate.getTime(),
-                endingDay: d.getTime() === endDate.getTime(),
-                color: "#ec85c7",
-                textColor: "white",
-              };
-            }
+      const startDateFormated = startDate.toISOString().split("T")[0];
+      const endDateFormated = endDate.toISOString().split("T")[0];
 
-            return { ...acc, ...dates };
-          }, {}),
-      };
+      const startDateWithFirstHour = new Date(
+        Date.UTC(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate()
+        )
+      );
+      const endDateWithLastHour = new Date(
+        Date.UTC(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+          23,
+          59,
+          59
+        )
+      );
+
+      for (
+        let d = startDateWithFirstHour;
+        d <= endDateWithLastHour;
+        d.setDate(d.getDate() + 1)
+      ) {
+        const formattedDate = d.toISOString().split("T")[0];
+        dates[formattedDate] = {
+          startingDay: formattedDate === startDateFormated,
+          endingDay: formattedDate === endDateFormated,
+          color: "#ec85c7",
+          textColor: "white",
+        };
+      }
+
+      return dates;
     };
 
     const handleExitButton = () => {
-      if (selectedDates.length < 2) {
+      if (!selectedDates.length) {
         return;
       }
       const [startDate, endDate] = selectedDates.sort(
         (a, b) => a.getTime() - b.getTime()
       );
-      setRangeDays({ start: startDate, end: endDate });
+      setRangeDays({ start: startDate, end: endDate ?? startDate });
       setVisibleCalendar(false);
     };
 
@@ -101,20 +133,35 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
         <View margin-16>
           <Button
             style={{
-              ...(selectedDates.length < 2
-                ? {}
-                : { backgroundColor: "#ec85c7" }),
+              ...(!selectedDates.length ? {} : { backgroundColor: "#ec85c7" }),
             }}
             onPress={handleExitButton}
-            disabled={selectedDates.length < 2}
+            disabled={!selectedDates.length}
           >
             <Text color={"white"}>Save</Text>
           </Button>
           <Calendar
-            maxDate={new Date().toString()}
+            maxDate={new Date(Date.now() - 86400000).toString()}
             onDayPress={(data) => {
               handleDayPress(data.timestamp);
             }}
+            showSixWeeks={true}
+            renderArrow={(direction) => (
+              <Ionicons
+                color={
+                  disableNextMonth && direction === "right"
+                    ? "#d9e1e8"
+                    : "#ec85c7"
+                }
+                size={24}
+                name={
+                  direction === "left"
+                    ? "chevron-back-outline"
+                    : "chevron-forward-outline"
+                }
+              />
+            )}
+            enableSwipeMonths={true}
             onMonthChange={(data) => {
               const currentDate = new Date();
               const currentMonth = currentDate.getMonth() + 1;
@@ -123,6 +170,7 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
               setDisableNextMonth(
                 data.month === currentMonth && data.year === currentYear
               );
+              selectedDate.current = data;
             }}
             disableArrowRight={disableNextMonth}
             theme={{
