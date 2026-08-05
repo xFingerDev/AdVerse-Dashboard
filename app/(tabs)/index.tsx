@@ -1,5 +1,5 @@
 import { useAdNetworkManager } from "@/contexts/AdNetworkManagerContext";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import AnalyticsEmpty from "@/components/analytics/AnalyticsEmpty";
 import AnalyticsFilter from "@/components/analytics/AnalyticsFilter";
@@ -10,7 +10,7 @@ import {
   AnalyticTypeEnum,
   AplicationAnalytic,
 } from "@/repository/INetworkAnalytic";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
 import { Text, View } from "react-native-ui-lib";
@@ -23,7 +23,8 @@ export default function TabOneScreen() {
     AnalyticTypeEnum.today
   );
   const [analytics, setAnalytics] = useState<AplicationAnalytic[] | null>(null);
-
+  const router = useRouter();
+  const loaded = useRef<boolean>(false);
   const onRefresh = async () => {
     setRefreshing(true);
 
@@ -41,6 +42,17 @@ export default function TabOneScreen() {
       onRefresh();
     }, [rangeDay])
   );
+
+  useEffect(() => {
+    const redirectToAnalytics = async () => {
+      if (!loaded.current && !adNetworkManager.loadedNetworks().length) {
+        loaded.current = true;
+        await Promise.resolve(); //TODO: I don't knwo but this works
+        router.push("/(modals)/analyticsNetwork");
+      }
+    };
+    redirectToAnalytics();
+  }, [adNetworkManager, router]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -84,7 +96,7 @@ export default function TabOneScreen() {
                 ? analytics.reduce((acc, app) => acc + app.totalImpressions, 0)
                 : 0
             }
-            currencyCode={analytics?.[0].currencyCode ?? ""}
+            currencyCode={analytics?.[0]?.currencyCode ?? ""}
           />
           <Text
             text40BO
@@ -96,7 +108,7 @@ export default function TabOneScreen() {
           >
             {t("analytics.applications.title")}
           </Text>
-          {!analytics?.length && <AnalyticsEmpty />}
+          {!analytics?.length && <AnalyticsEmpty showLoading={refreshing} />}
           <ApplicationsList analytics={analytics} analyticType={rangeDay} />
         </View>
       </ScrollView>

@@ -5,7 +5,8 @@
     },
     "applications": {
       "title": "Applications",
-      "empty": "No Analytics available"
+      "empty": "No Analytics available",
+      "loading": "Loading data..."
     },
     "summary": {
       "earnings": "Earnings",

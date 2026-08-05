@@ -131,15 +131,6 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
         }}
       >
         <View margin-16>
-          <Button
-            style={{
-              ...(!selectedDates.length ? {} : { backgroundColor: "#ec85c7" }),
-            }}
-            onPress={handleExitButton}
-            disabled={!selectedDates.length}
-          >
-            <Text color={"white"}>Save</Text>
-          </Button>
           <Calendar
             maxDate={new Date(Date.now() - 86400000).toString()}
             onDayPress={(data) => {
@@ -183,6 +174,17 @@ const AnalyticsFilter: React.FC<AnalyticsFilterProps> = ({
             markingType={"period"}
             markedDates={generateMarkedDates()}
           />
+          <Button
+            style={{
+              ...(!selectedDates.length ? {} : { backgroundColor: "#ec85c7" }),
+            }}
+            marginB-30
+            marginT-20
+            onPress={handleExitButton}
+            disabled={!selectedDates.length}
+          >
+            <Text color={"white"}>Save</Text>
+          </Button>
         </View>
       </BottonSheet>
     );

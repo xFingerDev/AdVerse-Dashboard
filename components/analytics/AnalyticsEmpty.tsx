@@ -11,7 +11,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { Text, View } from "react-native-ui-lib";
 
-const AnalyticsEmpty: React.FC = () => {
+type AnalyticsEmptyProps = {
+  showLoading: boolean;
+};
+
+const AnalyticsEmpty: React.FC<AnalyticsEmptyProps> = ({
+  showLoading,
+}: AnalyticsEmptyProps) => {
   const { t } = useTranslation();
 
   const sv = useSharedValue(0);
@@ -69,7 +75,11 @@ const AnalyticsEmpty: React.FC = () => {
                 letterSpacing: 0.3,
               }}
             >
-              {t("analytics.applications.empty")}
+              {t(
+                showLoading
+                  ? "analytics.applications.loading"
+                  : "analytics.applications.empty"
+              )}
             </Text>
           </Animated.View>
         </View>

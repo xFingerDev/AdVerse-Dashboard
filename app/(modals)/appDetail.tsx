@@ -1,5 +1,6 @@
 import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
 
+import AnalyticsEmpty from "@/components/analytics/AnalyticsEmpty";
 import AnalyticsFilter from "@/components/analytics/AnalyticsFilter";
 import AnalyticsSummary from "@/components/analytics/AnalyticsSummary";
 import { ApplicationsDetail } from "@/components/analytics/ApplicationCard";
@@ -65,8 +66,8 @@ const AnalyticsApps: React.FC<{
         {t("analytics.countries.title")}
       </Text>
 
-      {sortedCountries.map(([country, data]) => (
-        <Animated.View key={country} entering={FadeIn}>
+      {sortedCountries.map(([country, data], index) => (
+        <Animated.View key={country} entering={FadeIn.delay(index * 100)}>
           <Card
             padding-16
             marginB-16
@@ -113,7 +114,7 @@ const AnalyticsApps: React.FC<{
                 <ApplicationsDetail
                   title={t("analytics.summary.eCPM")}
                   content={`${formatNumericAbbreviation(
-                    (data.earnings / data.impressions) * 10
+                    (data.earnings / data.impressions) * 1000
                   )}`}
                 />
               </View>
@@ -236,6 +237,7 @@ export default function AppDetail() {
           />
         </View>
         <AnalyticsApps app={appAnalytics} />
+        {!appAnalytics && <AnalyticsEmpty showLoading={refreshing} />}
       </ScrollView>
     </SafeAreaView>
   );

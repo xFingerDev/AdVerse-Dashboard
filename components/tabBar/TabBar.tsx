@@ -12,14 +12,7 @@ const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
       paddingT-8
       paddingB-20={Platform.OS === "ios"}
       style={{
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        borderTopLeftRadius: 45,
-        borderTopRightRadius: 45,
-        elevation: 10,
-        shadowColor: "#000",
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
+        //borderRadius: 45,
         backgroundColor: Colors.grey70,
       }}
     >

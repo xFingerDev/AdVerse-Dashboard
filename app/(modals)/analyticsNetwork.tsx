@@ -40,6 +40,9 @@ export default function AnalyticsNetwork() {
       }),
       -1
     );
+    if (!adNetworkManager.loadedNetworks().length) {
+      setVisibleAdNetworks(true);
+    }
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
